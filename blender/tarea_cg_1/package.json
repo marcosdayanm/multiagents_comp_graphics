@@ -1,0 +1,12 @@
+{
+  "name": "wheel_generator",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "OBJ format wheel generator",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "author": "marcos",
+  "license": "ISC"
+}
