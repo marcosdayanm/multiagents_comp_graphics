@@ -23,38 +23,41 @@ class LifeCell(Agent):
             condition: True or False, or randomly one of them
         """
         super().__init__(pos, model)
-        self.pos = pos
-        self.condition = condition
-        self._next_condition = None
+        # self.pos = pos
+        self.condition = condition()
+        self._next_condition = self.condition
 
     def step(self):
         """
         Determines the next step of the LifeCell based on The Life Game Logic, checking the upper cells of the agent
         """
 
-        neighbors = self.model.grid.get_neighborhood(
+        neighbors = self.model.grid.get_neighbors(
             pos=self.pos,
             moore=True,
             radius=1,
             include_center=False
         )
 
-        filtered_neighbors = [neighbor.condition for neighbor in neighbors if neighbor.pos[1] > self.pos[1]]
+        left = [neighbor for neighbor in neighbors if neighbor.pos == (self.pos[0] - 1, self.pos[1] + 1) or self.pos[1] == 49 and neighbor.pos == (self.pos[0] - 1, 0)]
+        center = [neighbor for neighbor in neighbors if neighbor.pos == (self.pos[0], self.pos[1] + 1) or self.pos[1] == 49 and neighbor.pos == (self.pos[0], 0)]
+        right = [neighbor for neighbor in neighbors if neighbor.pos == (self.pos[0] + 1, self.pos[1] + 1) or self.pos[1] == 49 and neighbor.pos == (self.pos[0] + 1, 0)]
 
-        if len(filtered_neighbors) == 3:
-            l, u, r = filtered_neighbors[0], filtered_neighbors[1], filtered_neighbors[2]
 
-            # Dead
-            #        111                   101                     010                000
-            if (l and u and r) or (l and not u and r) or (not l and u and not r) or not (l and u and r):
+        if len(left) == 1 and len(center) == 1 and len(right) == 1:
+            l = int(left[0].condition)
+            u = int(center[0].condition)
+            r = int(right[0].condition)
+            parents = f"{l}{u}{r}"
+
+            if parents in ["111", "101", "010", "000"]:
                 self._next_condition = False
             
-            # Alive
-            #         110                    100                     001                        001                       
-            if (l and u and not r) or (l and not u and not r) or (not l and not u and r) or (not l and not u and r):
+            if parents in ["110", "100", "011", "001"]:
                 self._next_condition = True
         
-
+        else:
+            self._next_condition = False if len(center) == 1 and (len(left) == 0 or len(right) == 0) else self.condition
     
     def advance(self):
         """

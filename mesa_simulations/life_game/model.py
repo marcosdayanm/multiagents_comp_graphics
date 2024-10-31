@@ -1,26 +1,27 @@
+import random
 import mesa
 from mesa import Model, DataCollector
 from mesa.space import SingleGrid
 from mesa.time import SimultaneousActivation 
 
-from agent import TreeCell
+from agent import LifeCell
 
-class ForestFire(Model):
+class LifeGameGrid(Model):
     """
-        Simple Forest Fire model.
+        Simple Life Game Grid model.
 
         Attributes:
             height, width: Grid size.
             density: What fraction of grid cells have a tree in them.
     """
 
-    def __init__(self, height=100, width=100, density=0.65):
+    def __init__(self, height=50, width=50, density=0.65, simulation_mode=1):
         """
-        Create a new forest fire model.
+        Create a new Life Game Grid model.
         
         Args:
             height, width: The size of the grid to model
-            density: What fraction of grid cells have a tree in them.
+            density: What fraction of grid cells are alive.
         """
 
         # Set up model objects
@@ -28,32 +29,35 @@ class ForestFire(Model):
         # This is necessary in this model because the next state of each cell depends on the current state of all its neighbors -- before they've changed.
         # This activation method requires that all the agents have a step() and an advance() method. 
         # The step() method computes the next state of the agent, and the advance() method sets the state to the new computed state.
+        super().__init__()
         self.schedule = SimultaneousActivation(self)
-        self.grid = SingleGrid(height, width, torus=False)
+        self.grid = SingleGrid(height, width, torus=False if simulation_mode == 1 else True)
+        self.current_step = 0
+        self.simulation_mode = simulation_mode
 
         # A datacollector is a Mesa object for collecting data about the model.
         # We'll use it to count the number of trees in each condition each step.
         self.datacollector = DataCollector(
             {
-                "Fine": lambda m: self.count_type(m, "Fine"),
-                "On Fire": lambda m: self.count_type(m, "On Fire"),
-                "Burned Out": lambda m: self.count_type(m, "Burned Out"),
+                "Alive": lambda m: self.count_type(m, True),
+                "Dead": lambda m: self.count_type(m, False),
             }
         )
 
         # Place a tree in each cell with Prob = density
         # coord_iter is an iterator that returns positions as well as cell contents.
         for contents, (x, y) in self.grid.coord_iter():
-            if self.random.random() < density:
-                # Create a tree
-                new_tree = TreeCell((x, y), self)
-                
-                # Set all trees in the first column on fire.
-                if x == 0:
-                    new_tree.condition = "On Fire"
-                
-                self.grid.place_agent(new_tree, (x, y))
-                self.schedule.add(new_tree)
+            # Create a tree
+            life_cell = LifeCell((x, y), self)
+            
+            # Set all trees in the first column on fire.
+            if self.simulation_mode == 1:
+                life_cell.condition = random.choices([True, False], weights=(density*100 , 100 - (density * 100)), k=1)[0] if y == 49 else False
+            elif self.simulation_mode == 2:
+                life_cell.condition = random.choices([True, False], weights=(density*100 , 100 - (density * 100)), k=1)[0]
+
+            self.grid.place_agent(life_cell, (x, y))
+            self.schedule.add(life_cell)
 
         self.running = True
         self.datacollector.collect(self)
@@ -66,19 +70,23 @@ class ForestFire(Model):
         # collect data
         self.datacollector.collect(self)
 
+        self.current_step += 1
+
         # Halt if no more fire
-        if self.count_type(self, "On Fire") == 0:
+        if self.count_type(self, True) == 0 or (self.simulation_mode == 1 and self.current_step >= 49): #|| self.ste:
             self.running = False
+
+
 
 
     # staticmethod is a Python decorator that makes a method callable without an instance.
     @staticmethod
-    def count_type(model, tree_condition):
+    def count_type(model, life_cell_condition):
         """
-        Helper method to count trees in a given condition in a given model.
+        Helper method to count LifeCells in a given condition in a given model.
         """
         count = 0
         for tree in model.schedule.agents:
-            if tree.condition == tree_condition:
+            if tree.condition == life_cell_condition:
                 count += 1
         return count
