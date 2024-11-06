@@ -4,9 +4,7 @@ from mesa.visualization import Slider
 
 from model import LifeGameGrid
 
-
 # The colors of the portrayal will depend on the life_cell's condition.
-# COLORS = {"Alive": "#FFFFFF", "Dead": "#000000"}
 COLORS = {"Alive": "#000000", "Dead": "#FFFFFF"}
 
 # The portrayal is a dictionary that is used by the visualization server to
@@ -48,9 +46,6 @@ model_params = {
 # The modular server is a special visualization server that allows multiple
 # elements to be displayed simultaneously, and for each of them to be updated
 # when the user interacts with them.
-# server = ModularServer(
-#     LifeGameGrid, [canvas_element, life_cell_chart, pie_chart], "Life Game", model_params
-# )
 server = ModularServer(
     LifeGameGrid, [canvas_element, life_cell_chart, pie_chart], "Life Game", model_params
 )

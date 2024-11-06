@@ -47,10 +47,9 @@ class LifeGameGrid(Model):
         # Place a tree in each cell with Prob = density
         # coord_iter is an iterator that returns positions as well as cell contents.
         for contents, (x, y) in self.grid.coord_iter():
-            # Create a tree
+            # Create a Life Cell
             life_cell = LifeCell((x, y), self)
             
-            # Set all trees in the first column on fire.
             if self.simulation_mode == 1:
                 life_cell.condition = random.choices([True, False], weights=(density*100 , 100 - (density * 100)), k=1)[0] if y == 49 else False
             elif self.simulation_mode == 2:
@@ -72,14 +71,10 @@ class LifeGameGrid(Model):
 
         self.current_step += 1
 
-        # Halt if no more fire
-        if self.count_type(self, True) == 0 or (self.simulation_mode == 1 and self.current_step >= 49): #|| self.ste:
+        # Halt if no more alive cells or if the simulation gets finished
+        if self.count_type(self, True) == 0 or (self.simulation_mode == 1 and self.current_step >= 49):
             self.running = False
 
-
-
-
-    # staticmethod is a Python decorator that makes a method callable without an instance.
     @staticmethod
     def count_type(model, life_cell_condition):
         """
