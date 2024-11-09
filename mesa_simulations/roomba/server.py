@@ -86,11 +86,9 @@ view_elements.insert(0, grid)
 
 
 server = ModularServer(RandomModel
-                    #    , [grid, bar_chart]
                         ,  view_elements
                         , "Roomba"
                         , model_params)
-# server = ModularServer(RandomModel, [grid], "Roomba", model_params)
                        
 server.port = 8521 # The default
 server.launch()
