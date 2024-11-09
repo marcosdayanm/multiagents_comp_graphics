@@ -198,6 +198,7 @@ class RoombaAgent(Agent):
         self.trash_map.update(roomba_agent.trash_map)
         self.obstacle_map.update(roomba_agent.obstacle_map)
         self.visited_cells_map.update(roomba_agent.visited_cells_map)
+        self.battery_level -= 1
 
 
     def determine_next_move(self) -> tuple[int, int]:
