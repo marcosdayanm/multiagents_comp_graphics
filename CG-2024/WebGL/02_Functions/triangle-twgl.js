@@ -6,9 +6,10 @@
  * 2024-07-02
  */
 
-"use strict";
 
-import * as twgl from "twgl-base.js";
+'use strict';
+
+import * as twgl from 'twgl-base.js'
 
 // Define the shader code, using GLSL 3.00
 
@@ -37,41 +38,44 @@ void main() {
 }
 `;
 
+
 function main_twgl() {
-  const canvas = document.querySelector("canvas");
-  const gl = canvas.getContext("webgl2");
+    const canvas = document.querySelector('canvas');
+    const gl = canvas.getContext('webgl2');
 
-  const programInfo = twgl.createProgramInfo(gl, [vsGLSL, fsGLSL]);
-  //console.log(programInfo.program);
+    const programInfo = twgl.createProgramInfo(gl, [vsGLSL, fsGLSL]);
+    //console.log(programInfo.program);
 
-  // Create an object that contains the arrays with the data
-  // for each of the vertices
-  const arrays = generateData();
+    // Create an object that contains the arrays with the data
+    // for each of the vertices
+    const arrays = generateData();
 
-  const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
+    const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
 
-  const vao = twgl.createVAOFromBufferInfo(gl, programInfo, bufferInfo);
+    const vao = twgl.createVAOFromBufferInfo(gl, programInfo, bufferInfo);
 
-  gl.bindVertexArray(vao);
+    gl.bindVertexArray(vao);
 
-  gl.useProgram(programInfo.program);
+    gl.useProgram(programInfo.program);
 
-  // compute 3 vertices for 1 triangle
-  twgl.drawBufferInfo(gl, bufferInfo);
+    // compute 3 vertices for 1 triangle
+    twgl.drawBufferInfo(gl, bufferInfo);
 }
 
 // Create the data for the vertices of the polyton, as an object with two arrays
 function generateData() {
-  let arrays = {
-    position: {
-      numComponents: 2,
-      data: new Float32Array([
-        0, 0.7, 0.5, -0.7, -0.5, -0.7, 0, -1, -0.7, -0.8, -0.2, -0.2,
-      ]),
-    },
-    color: {
-      numComponents: 4,
-      /*
+    let arrays = {
+        position: {
+            numComponents: 2,
+            data: new Float32Array([
+                0,   0.7,
+                0.5,  -0.7,
+                -0.5,  -0.7,
+            ])
+        },
+        color: {
+            numComponents: 4, 
+            /*
             // If not type is indicated, twgl will assume a float
             data: [
                 1, 0, 0, 1,
@@ -79,15 +83,16 @@ function generateData() {
                 0, 0, 1, 1,
             ]
             */
-      // To pass integer values, the type must be specified
-      data: new Uint8Array([
-        255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 0, 0, 255, 0, 255,
-        0, 255, 0, 0, 255, 255,
-      ]),
-    },
-  };
+            // To pass integer values, the type must be specified
+            data: new Uint8Array([
+                255, 0, 0, 255,
+                0, 255, 0, 255,
+                0, 0, 255, 255,
+            ])
+        }
+    };
 
-  return arrays;
+    return arrays;
 }
 
-main_twgl();
+main_twgl()

@@ -11,7 +11,6 @@
 import * as twgl from 'twgl-base.js'
 import { shapeF } from '../00_common/shapes.js'
 import { m3 } from '../libs/libs2D.js'
-import GUI from 'lil-gui'
 
 // Define the shader code, using GLSL 3.00
 
@@ -53,39 +52,10 @@ void main() {
 }
 `;
 
-
-// Structure for the global data of all objects
-const objects = {
-    model: {
-        transforms: {
-            t: {
-                x: 0,
-                y: 0,
-                z: 0,
-            },
-            rr: {
-                x: 0,
-                y: 0,
-                z: 0,
-            },
-            s: {
-                x: 1,
-                y: 1,
-                z: 1,
-            }
-        },
-        color: [1, 0.3, 0, 1],
-    }
-}
-
 // Initialize the WebGL environmnet
 function main() {
     const canvas = document.querySelector('canvas');
     const gl = canvas.getContext('webgl2');
-    twgl.resizeCanvasToDisplaySize(gl.canvas);
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    setupUI(gl);
 
     const programInfo = twgl.createProgramInfo(gl, [vsGLSL, fsGLSL]);
 
@@ -100,10 +70,14 @@ function main() {
 
 // Function to do the actual display of the objects
 function drawScene(gl, vao, programInfo, bufferInfo) {
+    twgl.resizeCanvasToDisplaySize(gl.canvas);
 
-    let translate = [objects.model.transforms.t.x, objects.model.transforms.t.y];
-    let angle_radians = objects.model.transforms.rr.z;
-    let scale = [objects.model.transforms.s.x, objects.model.transforms.s.y];
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    let translate = [240, 150];
+    let angle_degrees = 30;
+    let angle_radians = angle_degrees * Math.PI / 180;
+    let scale = [3.1, 1.2];
 
     // Create transform matrices
     const scaMat = m3.scale(scale);
@@ -120,7 +94,7 @@ function drawScene(gl, vao, programInfo, bufferInfo) {
     {
         u_resolution: [gl.canvas.width, gl.canvas.height],
         u_transforms: transforms,
-        u_color: objects.model.color,
+        u_color: [Math.random(), Math.random(), Math.random(), 1],
     }
 
     gl.useProgram(programInfo.program);
@@ -130,27 +104,6 @@ function drawScene(gl, vao, programInfo, bufferInfo) {
     gl.bindVertexArray(vao);
 
     twgl.drawBufferInfo(gl, bufferInfo);
-
-    requestAnimationFrame(() => drawScene(gl, vao, programInfo, bufferInfo));
-}
-
-function setupUI(gl)
-{
-    const gui = new GUI();
-
-    const traFolder = gui.addFolder('Translation');
-    traFolder.add(objects.model.transforms.t, 'x', 0, gl.canvas.width);
-    traFolder.add(objects.model.transforms.t, 'y', 0, gl.canvas.height);
-
-    const rotFolder = gui.addFolder('Rotation');
-    rotFolder.add(objects.model.transforms.rr, 'z', 0, Math.PI * 2);
-
-    const scaFolder = gui.addFolder('Scale');
-    scaFolder.add(objects.model.transforms.s, 'x', -5, 5);
-    scaFolder.add(objects.model.transforms.s, 'y', -5, 5);
-
-
-    gui.addColor(objects.model, 'color');
 }
 
 main()
