@@ -1,7 +1,8 @@
 import fs from "fs";
 
 import { parseArgv } from "./parseArgv.js";
-import { generateFormOnText } from "./generateFormOnText.js";
+// import { generateFormOnText } from "./generateFormOnText.js";
+import { generateFormOnText } from "./generateFormOnTextWithNormals.js";
 
 const { numSides, radius, thickness } = parseArgv();
 
